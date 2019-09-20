@@ -11,11 +11,16 @@ const fs = require('fs');
 
 class MySQLDatabase {
 
-    constructor() {
+    constructor(forceDBSeeding) {
 
-        this.connectionDetails = new MySQLConnectionDetails(true);
+        this.forceDBSeeding = forceDBSeeding;
 
-        this.database = this.connectionDetails.database;
+        this.connectionDetails = null;
+        this.database = null;
+
+        this.setConnectionDetails(true);
+        this.setDatabaseName();  //set only one time
+
         this.sqlSchemaPath = configPaths.sqlSchemaPath;
         this.sqlSeedsPath = configPaths.sqlSeedsPath;
 
@@ -25,6 +30,30 @@ class MySQLDatabase {
 
         this.connectLock = false;
         this.disconnectLock = false;
+    }
+
+    setConnectionDetails(connectToDB) {  //might be set several times for database seeding
+
+        if (process.env.JAWSDB_URL) {
+
+            this.connectionDetails = process.env.JAWSDB_URL;
+        }
+        else {
+
+            this.connectionDetails = new MySQLConnectionDetails(connectToDB);
+        }
+    }
+
+    setDatabaseName() {  //set only one time
+
+        if (process.env.JAWSDB_URL) {
+
+            this.database = "JAWSDB";
+        }
+        else {
+
+            this.database = this.connectionDetails.database;
+        }
     }
 
     connect() {
@@ -45,23 +74,32 @@ class MySQLDatabase {
 
         this.connectLock = true;
 
-        const promise = mysql2.createConnection(this.connectionDetails);
+        return new Promise((resolve) => {
+           
+            const promise = mysql2.createConnection(this.connectionDetails);
 
-        promise.then((newConnection) => {
+            promise.then((newConnection) => {
+    
+                this.connectionID = newConnection.connection._handshakePacket.connectionId;
+                this.connection = newConnection;
+                this.isConnected = true;
+                this.connectLock = false;
+    
+                terminal.gray(`  Connected to database [`).white(`${this.connection.config.database}`).gray(`] using connection id [`).white(`${this.connectionID}`).gray(`]\n\n`);
+    
+                resolve();
 
-            this.connectionID = newConnection.connection._handshakePacket.connectionId;
-            this.connection = newConnection;
-            this.isConnected = true;
-            this.connectLock = false;
+            }).catch((error) => {
+    
+                process.once("seedingComplete", () => {
+                   
+                    resolve();
+                });
 
-            terminal.gray(`  Connected to database [`).white(`${this.connection.config.database}`).gray(`] using connection id [`).white(`${this.connectionID}`).gray(`]\n\n`);
+                this.seedDatabaseOrExit(error);
+            });
 
-        }).catch((error) => {
-
-            this.seedDatabaseOrExit(error);
         });
-
-        return promise;
     }
 
     disconnect() {
@@ -112,23 +150,30 @@ class MySQLDatabase {
 
             terminal.red(`  Missing [`).white(`${this.database}`).red(`] database...\n\n`);
 
-            const promise = this.promptToSeedDatabase();
+            if (this.forceDBSeeding) {
 
-            promise.then((answer) => {
+                this.seedDatabase();
+            }
+            else {
 
-                setTimeout(() => {
-                    
-                    if (answer.seedDB) {
+                const promise = this.promptToSeedDatabase();
 
-                        this.seedDatabase();
-                    }
-                    else {
-         
-                        this.exit();
-                    }
-
-                }, 500);
-            });
+                promise.then((answer) => {
+    
+                    setTimeout(() => {
+                        
+                        if (answer.seedDB) {
+    
+                            this.seedDatabase();
+                        }
+                        else {
+             
+                            this.exit();
+                        }
+    
+                    }, 500);
+                });
+            }
         }
         else {
 
@@ -153,7 +198,7 @@ class MySQLDatabase {
 
     seedDatabase() {
 
-        this.connectionDetails = new MySQLConnectionDetails(false);  //no database assigned, just connect to MySQL without specifying a database
+        this.setConnectionDetails(false);  //no database assigned, just connect to MySQL without specifying a database
 
         this.connectLock = false;
 
@@ -167,15 +212,27 @@ class MySQLDatabase {
 
             this.queryDatabase(sqlSchemaSeeds, []).then(() => {
                 
-                terminal.gray(`  Seeding [`).white(`${this.database}`).gray(`] database finished. Please restart this application.\n\n`);
+                terminal.gray(`  Seeding [`).white(`${this.database}`).gray(`] database finished.\n\n`);
+
+                this.setConnectionDetails(true);  //Connect to newly created database
+
+                this.disconnect().then(() => {
+                   
+                    this.connect().then(() => {
+                    
+                        process.emit("seedingComplete");
+    
+                    }).catch((error) => {
+                        
+                        this.exitAfterFailedConnection(error);
+                    });
+                });
 
             }).catch((error) => {
                 
                 terminal.red(`  Seeding [`).white(`${this.database}`).red(`] ${error}\n\n`);
 
-            }).finally(() => {
-               
-                this.exit(); 
+                this.exit();
             });
 
         }).catch((error) => {

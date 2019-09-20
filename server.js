@@ -17,7 +17,7 @@ app.use(express.static(configPaths.publicAssetsPath));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-const mysqlDatabase = new MySQLDatabase();
+const mysqlDatabase = new MySQLDatabase(true);
 
 // const htmlRoutes = new HTMLroutes(paths);
 // const apiRoutes  = new APIRoutes(paths, friendsDatabase);
@@ -25,13 +25,13 @@ const mysqlDatabase = new MySQLDatabase();
 // app.use(htmlRoutes.router);
 // app.use(apiRoutes.router);
 
-app.listen(port, () => {
+header.printHeader();
 
-    terminal.hideCursor();
+mysqlDatabase.connect().then(() => {
+       
+    app.listen(port, () => {
 
-    header.printHeader();
-
-    terminal.white("  Webserver listening on port ► ").brightGreen(port + "\n\n");
-
-    mysqlDatabase.connect();
+        terminal.white("  Webserver listening on port ► ").brightGreen(port + "\n\n");
+    });  
+    
 });

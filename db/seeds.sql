@@ -7,14 +7,14 @@
         VALUES  ("Cheese"),
                 ("Bacon"),
                 ("Avocado"),
-				("Lettuce"),
+                ("Lettuce"),
                 ("Tomato"),
                 ("Onion"),
                 ("Mayo"),
                 ("Ketchup"),
                 ("Mustard");
                 
-		INSERT INTO burger_ingredients (fk_burger_id, fk_ingredient_id)
+        INSERT INTO burger_ingredients (fk_burger_id, fk_ingredient_id)
         VALUES  (1, 1),
                 (2, 1),
                 (2, 2),
