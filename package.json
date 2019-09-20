@@ -1,0 +1,24 @@
+{
+  "name": "burger",
+  "version": "1.0.0",
+  "description": "A full-stack web application that simulates some silly burger uselessness",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jbpkp07/Burger.git"
+  },
+  "author": "Jeremy Barnes",
+  "license": "ISC",
+  "homepage": "https://github.com/jbpkp07/Burger#readme",
+  "dependencies": {
+    "dotenv": "^8.1.0",
+    "express": "^4.17.1",
+    "express-handlebars": "^3.1.0",
+    "inquirer": "^7.0.0",
+    "mysql2": "^1.7.0",
+    "terminal-kit": "^1.31.3"
+  }
+}
