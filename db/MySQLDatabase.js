@@ -11,18 +11,15 @@ const fs = require('fs');
 
 class MySQLDatabase {
 
-    constructor(forceDBSeeding) {
+    constructor(forceDBSeedingIfMissing) {
 
-        this.forceDBSeeding = forceDBSeeding;
+        this.forceDBSeedingIfMissing = forceDBSeedingIfMissing;
 
         this.connectionDetails = null;
+        this.PRIVATE_setConnectionDetails(true); 
+
         this.database = null;
-
-        this.setConnectionDetails(true);
-        this.setDatabaseName();  //set only one time
-
-        this.sqlSchemaPath = configPaths.sqlSchemaPath;
-        this.sqlSeedsPath = configPaths.sqlSeedsPath;
+        this.PRIVATE_setDatabaseName();  //set only one time
 
         this.isConnected = false;
         this.connectionID = null;
@@ -30,30 +27,6 @@ class MySQLDatabase {
 
         this.connectLock = false;
         this.disconnectLock = false;
-    }
-
-    setConnectionDetails(connectToDB) {  //might be set several times for database seeding
-
-        if (process.env.JAWSDB_URL) {
-
-            this.connectionDetails = process.env.JAWSDB_URL;
-        }
-        else {
-
-            this.connectionDetails = new MySQLConnectionDetails(connectToDB);
-        }
-    }
-
-    setDatabaseName() {  //set only one time
-
-        if (process.env.JAWSDB_URL) {
-
-            this.database = "JAWSDB";
-        }
-        else {
-
-            this.database = this.connectionDetails.database;
-        }
     }
 
     connect() {
@@ -96,7 +69,7 @@ class MySQLDatabase {
                     resolve();
                 });
 
-                this.seedDatabaseOrExit(error);
+                this.PRIVATE_seedDatabaseOrExit(error);
             });
 
         });
@@ -142,7 +115,31 @@ class MySQLDatabase {
         return promise;
     }
 
-    seedDatabaseOrExit(error) {
+    PRIVATE_setConnectionDetails(connectToDB) {  //might be set several times for database seeding
+
+        if (process.env.JAWSDB_URL) {
+
+            this.connectionDetails = process.env.JAWSDB_URL;
+        }
+        else {
+
+            this.connectionDetails = new MySQLConnectionDetails(connectToDB);
+        }
+    }
+
+    PRIVATE_setDatabaseName() {  //set only one time
+
+        if (process.env.JAWSDB_URL) {
+
+            this.database = "JAWSDB";
+        }
+        else {
+
+            this.database = this.connectionDetails.database;
+        }
+    }
+
+    PRIVATE_seedDatabaseOrExit(error) {
 
         const isDatabaseMissing = (error.errno === 1049 && error.sqlState === '42000');
 
@@ -150,13 +147,13 @@ class MySQLDatabase {
 
             terminal.red(`  Missing [`).white(`${this.database}`).red(`] database...\n\n`);
 
-            if (this.forceDBSeeding) {
+            if (this.forceDBSeedingIfMissing) {
 
-                this.seedDatabase();
+                this.PRIVATE_seedDatabase();
             }
             else {
 
-                const promise = this.promptToSeedDatabase();
+                const promise = this.PRIVATE_promptToSeedDatabase();
 
                 promise.then((answer) => {
     
@@ -164,11 +161,11 @@ class MySQLDatabase {
                         
                         if (answer.seedDB) {
     
-                            this.seedDatabase();
+                            this.PRIVATE_seedDatabase();
                         }
                         else {
              
-                            this.exit();
+                            this.PRIVATE_exit();
                         }
     
                     }, 500);
@@ -177,11 +174,11 @@ class MySQLDatabase {
         }
         else {
 
-            this.exitAfterFailedConnection(error);
+            this.PRIVATE_exitAfterFailedConnection(error);
         }
     }
 
-    promptToSeedDatabase() {
+    PRIVATE_promptToSeedDatabase() {
 
         this.inquirerPrompts = new InquirerPrompts();
 
@@ -196,15 +193,15 @@ class MySQLDatabase {
         return promise;
     }
 
-    seedDatabase() {
+    PRIVATE_seedDatabase() {
 
-        this.setConnectionDetails(false);  //no database assigned, just connect to MySQL without specifying a database
+        this.PRIVATE_setConnectionDetails(false);  //no database assigned, just connect to MySQL without specifying a database
 
         this.connectLock = false;
 
         this.connect().then(() => {
 
-            const sqlSchemaSeeds = fs.readFileSync(this.sqlSchemaPath).toString() + "\n\n" + fs.readFileSync(this.sqlSeedsPath).toString();
+            const sqlSchemaSeeds = fs.readFileSync(configPaths.sqlSchemaPath).toString() + "\n\n" + fs.readFileSync(configPaths.sqlSeedsPath).toString();
 
             terminal.gray(`  Seeding [`).white(`${this.database}`).gray(`] database...\n\n\n`);
 
@@ -214,7 +211,7 @@ class MySQLDatabase {
                 
                 terminal.gray(`  Seeding [`).white(`${this.database}`).gray(`] database finished.\n\n`);
 
-                this.setConnectionDetails(true);  //Connect to newly created database
+                this.PRIVATE_setConnectionDetails(true);  //Connect to newly created database
 
                 this.disconnect().then(() => {
                    
@@ -224,7 +221,7 @@ class MySQLDatabase {
     
                     }).catch((error) => {
                         
-                        this.exitAfterFailedConnection(error);
+                        this.PRIVATE_exitAfterFailedConnection(error);
                     });
                 });
 
@@ -232,24 +229,24 @@ class MySQLDatabase {
                 
                 terminal.red(`  Seeding [`).white(`${this.database}`).red(`] ${error}\n\n`);
 
-                this.exit();
+                this.PRIVATE_exit();
             });
 
         }).catch((error) => {
 
-            this.exitAfterFailedConnection(error);
+            this.PRIVATE_exitAfterFailedConnection(error);
         });
     }
 
-    exitAfterFailedConnection(error) {
+    PRIVATE_exitAfterFailedConnection(error) {
 
         terminal.red(`  Unable to connect to database [`).white(`${this.database}`).red(`]\n\n`);
         terminal.red(`  ${error}\n\n`);
 
-        this.exit();
+        this.PRIVATE_exit();
     }
 
-    exit() {
+    PRIVATE_exit() {
 
         terminal.hideCursor("");  //with ("") it shows the cursor
         process.exit(0);

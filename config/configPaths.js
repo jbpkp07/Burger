@@ -15,8 +15,10 @@ const configPaths =
     configConnectionDetailsPath: getFullPath('../config/configConnectionDetails.js'),
     mySQLConnectionDetailsPath:  getFullPath('../db/MySQLConnectionDetails.js'),
     mySQLDatabasePath:           getFullPath('../db/MySQLDatabase.js'),
+    ormPath:                     getFullPath('../db/ORM.js'),
     sqlSchemaPath:               getFullPath('../db/schema.sql'),
     sqlSeedsPath:                getFullPath('../db/seeds.sql'),
+    burgerModelPath:             getFullPath('../models/Burger.js'),
     publicAssetsPath:            getFullPath('../public/assets'),
     inquirerPromptsPath:         getFullPath('../utility/InquirerPrompts.js'),
     printHeaderFunctionsPath:    getFullPath('../utility/printHeaderFunctions.js')
