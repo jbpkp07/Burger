@@ -11,7 +11,6 @@ function printHeader() {
 
     terminal.reset();
     terminal.clear();
-    terminal.hideCursor();
     terminal("\n");
     terminal.brightBlue(" ┌─────────────────────────────────────────────────────────────────────────────┐\n");
     terminal.brightBlue(" │").brightCyan("                               Burger Builder                                ").brightBlue("│\n");
