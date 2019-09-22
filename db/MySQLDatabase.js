@@ -141,7 +141,16 @@ class MySQLDatabase {
 
     PRIVATE_seedDatabaseOrExit(error) {
 
-        const isDatabaseMissing = (error.errno === 1049 && error.sqlState === '42000');
+        let isDatabaseMissing;
+
+        if (process.env.JAWSDB_URL) {
+
+            isDatabaseMissing = (error.errno === 1146 && error.sqlState === '42S02');
+        }
+        else {
+
+            isDatabaseMissing = (error.errno === 1049 && error.sqlState === '42000');
+        }
 
         if (isDatabaseMissing) {
 
