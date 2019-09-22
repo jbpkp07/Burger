@@ -16,28 +16,54 @@ class ORM {
         this.isSaved = false;
     }
 
-    getObject() {
+    //Simple/Pruned object for database transactions
+    getSimpleObject(complexObject, idColumnName, dataColumnNames) {
+
+        if (!complexObject) {
+
+            complexObject = this;
+        }
+
+        if (!idColumnName) {
+
+            idColumnName = this.idColumnName;
+        }
+
+        if (!dataColumnNames) {
+
+            dataColumnNames = this.dataColumnNames;
+        }
+
+        if (!complexObject || !idColumnName || !dataColumnNames) {
+
+            throw new Error("ORM.getSimpleObject() mssing parameters.");
+        }
 
         const object = {};
 
-        if (this[this.idColumnName] !== null) {
+        if (complexObject[idColumnName] !== null) {
 
-            object[this.idColumnName] = this[this.idColumnName];
+            object[idColumnName] = complexObject[idColumnName];
         }
 
-        for (const dataColumnName of this.dataColumnNames) {
+        for (const dataColumnName of dataColumnNames) {
 
-            if (dataColumnName !== this.idColumnName) {
+            if (dataColumnName !== idColumnName) {
 
-                object[dataColumnName] = this[dataColumnName];
+                object[dataColumnName] = complexObject[dataColumnName];
             }
         }
-        console.log(object);
+
         return object;
     }
 
     //Generic Query------------------------------------------------------------
     queryDatabase(query, placeholderArray) {
+
+        if (!query || !placeholderArray) {
+
+            return Promise.reject("ORM.queryDatabase() missing parameters.");
+        }
 
         const promise = this.mysqlDatabase.queryDatabase(query, placeholderArray);
 
@@ -49,17 +75,12 @@ class ORM {
 
         if (!object) {
 
-            object = this.getObject();
+            object = this.getSimpleObject();
         }
 
         if (!idColumnName) {
 
             idColumnName = this.idColumnName;
-
-            if (!idColumnName) {
-
-                return Promise.reject("idColumnName not specified.");
-            }
         }
 
         if (!tableName) {
@@ -67,7 +88,15 @@ class ORM {
             tableName = this.tableName;
         }
 
-        delete object[idColumnName];  //if it has the PK id specified, remove it to preserve AUTO_INCREMENT integrity
+        if (!object || !idColumnName || !tableName) {
+
+            return Promise.reject("ORM.insertOne() missing parameters.");
+        }
+
+        if (object[idColumnName]) {
+
+            return Promise.reject("ORM.insertOne() id column provided, rejected to protect database AUTO_INCREMENT integrity.");
+        }
 
         const query = `INSERT INTO ?? SET ? ;`;
 
@@ -89,6 +118,11 @@ class ORM {
             tableName = this.tableName;
         }
 
+        if (!id || !idColumnName || !tableName) {
+
+            return Promise.reject("ORM.selectOneById() missing parameters.");
+        }
+
         const query = `SELECT * FROM ?? WHERE ?? = ? ;`;
 
         const promise = this.queryDatabase(query, [tableName, idColumnName, id]);
@@ -103,6 +137,11 @@ class ORM {
             tableName = this.tableName;
         }
 
+        if (!tableName) {
+
+            return Promise.reject("ORM.selectAll() missing parameters.");
+        }
+
         const query = `SELECT * FROM ?? ;`;
 
         const promise = this.queryDatabase(query, [tableName]);
@@ -115,7 +154,7 @@ class ORM {
 
         if (!object) {
 
-            object = this.getObject();
+            object = this.getSimpleObject();
         }
 
         if (!idColumnName) {
@@ -129,6 +168,11 @@ class ORM {
         }
 
         const id = object[idColumnName];
+
+        if (!object || !idColumnName || !tableName || !id) {
+
+            return Promise.reject("ORM.updateOne() missing parameters.");
+        }
 
         const query = `UPDATE ?? SET ? WHERE ?? = ?`;
 
@@ -142,7 +186,7 @@ class ORM {
 
         if (!object) {
 
-            object = this.getObject();
+            object = this.getSimpleObject();
         }
 
         if (!idColumnName) {
@@ -157,6 +201,11 @@ class ORM {
 
         const id = object[idColumnName];
 
+        if (!object || !idColumnName || !tableName || !id) {
+
+            return Promise.reject("ORM.deleteOne() missing parameters.");
+        }
+
         const query = `DELETE FROM ?? WHERE ?? = ?`;
 
         const promise = this.queryDatabase(query, [tableName, idColumnName, id]);
@@ -169,7 +218,7 @@ class ORM {
 
         if (!object) {
 
-            object = this.getObject();
+            object = this.getSimpleObject();
         }
 
         if (!idColumnName) {
@@ -180,6 +229,11 @@ class ORM {
         if (!tableName) {
 
             tableName = this.tableName;
+        }
+
+        if (!object || !idColumnName || !tableName) {
+
+            return Promise.reject("ORM.saveOne() missing parameters.");
         }
 
         return new Promise((resolve, reject) => {

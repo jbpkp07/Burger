@@ -33,21 +33,12 @@ class Burger extends ORM {
         return promise;
     }
 
-    // getSimpleObject() {
+    delete() {
 
-    //     const simpleOBJ =
-    //     {
-    //         name: this.name,
-    //         devoured: this.devoured
-    //     };
+        const promise = this.deleteOne();
 
-    //     if (this.id !== null) {
-
-    //         simpleOBJ.id = this.id;
-    //     }
-
-    //     return simpleOBJ;
-    // }
+        return promise;
+    }
 }
 
 

@@ -13,6 +13,8 @@ const configPaths =
 {
     dotEnvPath:                  getFullPath('../config/.env'),
     configConnectionDetailsPath: getFullPath('../config/configConnectionDetails.js'),
+    controllerPath:              getFullPath('../controllers/Controller.js'),
+    burgersDatabasePath:         getFullPath('../db/BurgersDatabase.js'),
     mySQLConnectionDetailsPath:  getFullPath('../db/MySQLConnectionDetails.js'),
     mySQLDatabasePath:           getFullPath('../db/MySQLDatabase.js'),
     ormPath:                     getFullPath('../db/ORM.js'),
