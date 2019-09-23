@@ -12,11 +12,19 @@ class BurgersDatabase extends ORM {
         super(mysqlDatabase);
 
         this.burgersTableName = "burgers";
+        this.ingredientsTableName = "ingredients";
     }
 
     getAllBurgers() {
 
         const promise = this.selectAll(this.burgersTableName);
+
+        return promise;
+    }
+
+    getAllIngredients() {
+
+        const promise = this.selectAll(this.ingredientsTableName);
 
         return promise;
     }

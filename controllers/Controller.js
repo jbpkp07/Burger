@@ -19,19 +19,31 @@ class Controller {
     assignRouteListeners() {
 
         this.getHomePage();
-
-        this.getAPIFriends();
-
-        this.postAPIFriends();
     }
 
     getHomePage() {  //Single page web app, this is the only page needed!
 
         this.router.get("/", (request, response) => {
+    
+            const handleBarsOBJ = {};
 
-            this.burgersDatabase.getAllBurgers().then(([rows, fields]) => {
-                
-                response.json(rows);
+            const burgersPromise = this.burgersDatabase.getAllBurgers();
+            
+            burgersPromise.then(([rows, fields]) => {
+
+                handleBarsOBJ.burgers = rows;
+            });
+
+            const ingredientsPromise = this.burgersDatabase.getAllIngredients();
+            
+            ingredientsPromise.then(([rows, fields]) => {
+                   
+                handleBarsOBJ.ingredients = rows;
+            });
+
+            Promise.all([burgersPromise, ingredientsPromise]).then(() => {       
+   
+                response.render("index", handleBarsOBJ);
 
             }).catch((error) => {
                 
@@ -39,56 +51,50 @@ class Controller {
             });
         });
     }
-
-
-
-
-
-
     
-    getAPIFriends() {
+    // getAPIFriends() {
 
-        this.router.get("/api/friends", (request, response) => {
+    //     this.router.get("/api/friends", (request, response) => {
 
-            this.friendsDatabase.getAllFriendsJSON().then((jsonData) => {
+    //         this.friendsDatabase.getAllFriendsJSON().then((jsonData) => {
                
-                response.json(jsonData); 
-            });
-        });
-    }
+    //             response.json(jsonData); 
+    //         });
+    //     });
+    // }
 
-    postAPIFriends() {
+    // postAPIFriends() {
 
-        this.router.post("/api/friends", (request, response) => {
+    //     this.router.post("/api/friends", (request, response) => {
 
-            const { name }   = request.body;
-            const { photo }  = request.body;
-            const { scores } = request.body;
+    //         const { name }   = request.body;
+    //         const { photo }  = request.body;
+    //         const { scores } = request.body;
 
-            this.validatePhotoURL(photo).then(() => {
+    //         this.validatePhotoURL(photo).then(() => {
                 
-                this.friendsDatabase.addFriend(name, photo, scores).then((newFriend) => {
+    //             this.friendsDatabase.addFriend(name, photo, scores).then((newFriend) => {
                
-                    this.friendsDatabase.getFriendMatch(newFriend).then((bestFriendMatch) => {
+    //                 this.friendsDatabase.getFriendMatch(newFriend).then((bestFriendMatch) => {
                         
-                        response.json(bestFriendMatch);
+    //                     response.json(bestFriendMatch);
     
-                    });
-                }).catch((error) => {
+    //                 });
+    //             }).catch((error) => {
                    
-                    terminal.red(`  ${error.message}`).gray(`${error.reason}\n\n`);
+    //                 terminal.red(`  ${error.message}`).gray(`${error.reason}\n\n`);
      
-                    response.status(422).send(error);  //Unprocessable Entity (bad request data)                      
-                });
+    //                 response.status(422).send(error);  //Unprocessable Entity (bad request data)                      
+    //             });
 
-            }).catch((error) => {
+    //         }).catch((error) => {
                 
-                terminal.red(`  ${error.message}`).gray(`${error.reason}\n\n`);
+    //             terminal.red(`  ${error.message}`).gray(`${error.reason}\n\n`);
 
-                response.status(422).send(error);  //Unprocessable Entity (bad request data) 
-            });
-        });
-    }
+    //             response.status(422).send(error);  //Unprocessable Entity (bad request data) 
+    //         });
+    //     });
+    // }
 }
 
 
