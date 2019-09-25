@@ -1,7 +1,7 @@
 "use strict";
 /* global require, module, __dirname, process */
 
-const configPaths = require('./configPaths.js');
+const configPaths = require("./configPaths.js");
 
 const dotEnvOptionsOBJ = 
 {

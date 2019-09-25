@@ -1,12 +1,11 @@
 "use strict";
-/* global require, module, process */
 
-const configPaths = require('../config/configPaths.js');
+const configPaths = require("../config/configPaths.js");
 const InquirerPrompts = require(configPaths.inquirerPromptsPath);
 const MySQLConnectionDetails = require(configPaths.mySQLConnectionDetailsPath);
 const terminal = require("terminal-kit").terminal;
-const mysql2 = require('mysql2/promise');
-const fs = require('fs');
+const mysql2 = require("mysql2/promise");
+const fs = require("fs");
 
 
 class MySQLDatabase {
@@ -141,7 +140,7 @@ class MySQLDatabase {
 
     PRIVATE_seedDatabaseOrExit(error) {
 
-        const isDatabaseMissing = (error.errno === 1049 && error.sqlState === '42000');
+        const isDatabaseMissing = (error.errno === 1049 && error.sqlState === "42000");
 
         if (isDatabaseMissing) {
 

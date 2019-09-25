@@ -4,27 +4,27 @@ const configPaths = require("../config/configPaths.js");
 const ORM = require(configPaths.ormPath);
 
 
-class Burger extends ORM {
+class BurgerIngredient extends ORM {
 
     constructor(mysqlDatabase) {
 
-        const tableName = "burgers";
+        const tableName = "burger_ingredients";
         const idColumnName = "id";
-        const dataColumnNames = ["name", "devoured"];
+        const dataColumnNames = ["fk_burger_id", "fk_ingredient_id"];
 
         super(mysqlDatabase, tableName, idColumnName, dataColumnNames);
 
         this.id = null;
-        this.name = null;
-        this.devoured = false;
+        this.fk_burger_id = null;
+        this.fk_ingredient_id = null;
 
         this.isSaved = false;
     }
 
-    setValues(name, devoured) {
+    setValues(fkBurgerId, fkIngredientId) {
 
-        this.name = name;
-        this.devoured = devoured;
+        this.fk_burger_id = fkBurgerId;
+        this.fk_ingredient_id = fkIngredientId;
     }
 
     save() {
@@ -43,4 +43,4 @@ class Burger extends ORM {
 }
 
 
-module.exports = Burger;
+module.exports = BurgerIngredient;

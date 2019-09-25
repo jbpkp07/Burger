@@ -1,10 +1,11 @@
 <div id="screenWrapper">
+
     <div id="sidebar">
         <span id="titleText">Burgers</span>
         <hr>
         <div id="orderText">Order Burger</div>
         <form>
-            <input id="orderName" class="formInput" type="text" placeholder="Burger name (required)" spellcheck="false" required>
+            <input id="orderName" class="formInput" type="text" placeholder="Burger name (required)" spellcheck="false" autocomplete="off" required>
             {{#each ingredients}}
                 <div class="ingredientWrapper">
                     <span class="ingredientName">{{name}}</span>
@@ -16,33 +17,22 @@
     </div>
 
     <div id="burgers">
-        <div class="block">
-            1
-        </div>
-        <div class="block-blue">
-            2
-        </div>
-        <div class="block">
-            3
-        </div>
-        <div class="block-blue">
-            4
-        </div>
-
-
-        <div class="block">
-            5
-        </div>
-        <div class="block-blue">
-            6
-        </div>
-        <div class="block">
-            7
-        </div>
-        <div class="block-blue">
-            8
-        </div>
+        {{#each burgers}}
+            <div class="burger">
+                <div class="burgerName">{{name}}</div>
+                <div class="burgerIngredientsWrapper">
+                    {{#each ingredients}}
+                        <div class="burgerIngredient">{{this}}</div>
+                    {{/each}}
+                </div>
+                <div class="burgerActionsWrapper">
+                    <div class="btn burgerActionsBtn" data-type="devour" data-id="{{id}}" data-name="{{name}}">devour</div>
+                    <div class="btn burgerActionsBtn" data-type="delete" data-id="{{id}}" data-name="{{name}}">delete</div>
+                </div>
+            </div>
+        {{/each}}
     </div>
+
 </div>
 
 <script>
@@ -51,17 +41,3 @@
         const viewController = new ViewController();
     });
 </script>
-
-
-{{!-- <div id="links">
-    <a id="apiLink" href="/api/friends" class="btn">Friend Finder API</a>
-    <a id="githubLink" href="https://github.com/jbpkp07/FriendFinder" class="btn">GitHub Repo</a>
-</div> --}}
-
-{{!-- <ul>
-    {{#each cats}}
-        {{#if sleepy}}
-            {{> cats/cat-block sleep=false}}
-        {{/if}}
-    {{/each}}
-</ul> --}}

@@ -1,5 +1,4 @@
 "use strict";
-/* global module, require */
 
 const terminal = require("terminal-kit").terminal;
 
@@ -12,27 +11,10 @@ class ORM {
         this.tableName = tableName;
         this.idColumnName = idColumnName;
         this.dataColumnNames = dataColumnNames;
-
-        this.isSaved = false;
     }
 
     //Simple/Pruned object for database transactions
-    getSimpleObject(complexObject, idColumnName, dataColumnNames) {
-
-        if (!complexObject) {
-
-            complexObject = this;
-        }
-
-        if (!idColumnName) {
-
-            idColumnName = this.idColumnName;
-        }
-
-        if (!dataColumnNames) {
-
-            dataColumnNames = this.dataColumnNames;
-        }
+    getSimpleObject(complexObject = this, idColumnName = this.idColumnName, dataColumnNames = this.dataColumnNames) {
 
         if (!complexObject || !idColumnName || !dataColumnNames) {
 
@@ -57,7 +39,7 @@ class ORM {
         return object;
     }
 
-    //Generic Query------------------------------------------------------------
+    //Generic / Custom Query---------------------------------------------------
     queryDatabase(query, placeholderArray) {
 
         if (!query || !placeholderArray) {
@@ -71,22 +53,7 @@ class ORM {
     }
 
     //Create Query-------------------------------------------------------------
-    insertOne(object, idColumnName, tableName) {
-
-        if (!object) {
-
-            object = this.getSimpleObject();
-        }
-
-        if (!idColumnName) {
-
-            idColumnName = this.idColumnName;
-        }
-
-        if (!tableName) {
-
-            tableName = this.tableName;
-        }
+    insertOne(object = this.getSimpleObject(), idColumnName = this.idColumnName, tableName = this.tableName) {
 
         if (!object || !idColumnName || !tableName) {
 
@@ -95,7 +62,7 @@ class ORM {
 
         if (object[idColumnName]) {
 
-            return Promise.reject("ORM.insertOne() id column provided, rejected to protect database AUTO_INCREMENT integrity.");
+            return Promise.reject("ORM.insertOne() id column provided in transactional object, rejected to protect database AUTO_INCREMENT integrity.");
         }
 
         const query = `INSERT INTO ?? SET ? ;`;
@@ -106,17 +73,7 @@ class ORM {
     }
 
     //Read Queries-------------------------------------------------------------
-    selectOneById(id, idColumnName, tableName) {
-
-        if (!idColumnName) {
-
-            idColumnName = this.idColumnName;
-        }
-
-        if (!tableName) {
-
-            tableName = this.tableName;
-        }
+    selectOneById(id, idColumnName = this.idColumnName, tableName = this.tableName) {
 
         if (!id || !idColumnName || !tableName) {
 
@@ -130,12 +87,7 @@ class ORM {
         return promise;
     }
 
-    selectAll(tableName) {
-
-        if (!tableName) {
-
-            tableName = this.tableName;
-        }
+    selectAll(tableName = this.tableName) {
 
         if (!tableName) {
 
@@ -150,22 +102,7 @@ class ORM {
     }
 
     //Update Query-------------------------------------------------------------
-    updateOne(object, idColumnName, tableName) {
-
-        if (!object) {
-
-            object = this.getSimpleObject();
-        }
-
-        if (!idColumnName) {
-
-            idColumnName = this.idColumnName;
-        }
-
-        if (!tableName) {
-
-            tableName = this.tableName;
-        }
+    updateOne(object = this.getSimpleObject(), idColumnName = this.idColumnName, tableName = this.tableName) {
 
         const id = object[idColumnName];
 
@@ -182,22 +119,7 @@ class ORM {
     }
 
     //Delete Query-------------------------------------------------------------
-    deleteOne(object, idColumnName, tableName) {
-
-        if (!object) {
-
-            object = this.getSimpleObject();
-        }
-
-        if (!idColumnName) {
-
-            idColumnName = this.idColumnName;
-        }
-
-        if (!tableName) {
-
-            tableName = this.tableName;
-        }
+    deleteOne(object = this.getSimpleObject(), idColumnName = this.idColumnName, tableName = this.tableName) {
 
         const id = object[idColumnName];
 
@@ -214,26 +136,16 @@ class ORM {
     }
 
     //High-level Methods-------------------------------------------------------
-    saveOne(object, idColumnName, tableName) {
-
-        if (!object) {
-
-            object = this.getSimpleObject();
-        }
-
-        if (!idColumnName) {
-
-            idColumnName = this.idColumnName;
-        }
-
-        if (!tableName) {
-
-            tableName = this.tableName;
-        }
+    saveOne(object = this.getSimpleObject(), idColumnName = this.idColumnName, tableName = this.tableName) {
 
         if (!object || !idColumnName || !tableName) {
 
             return Promise.reject("ORM.saveOne() missing parameters.");
+        }
+
+        if (typeof this.isSaved === "undefined") {
+
+            return Promise.reject("ORM.saveOne() called incorrectly from a non-derived class.");
         }
 
         return new Promise((resolve, reject) => {
@@ -278,7 +190,7 @@ class ORM {
                 
                 terminal.red(`  ORM.save() error:\n\n`).white(`${error}\n\n`);
 
-                reject();
+                reject(error);
             });
         });
     }

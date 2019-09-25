@@ -2,7 +2,7 @@
 /* global require, module, process */
 
 const terminal = require("terminal-kit").terminal;
-const inquirer = require('inquirer');
+const inquirer = require("inquirer");
 
 
 class InquirerPrompts {
@@ -37,11 +37,11 @@ class InquirerPrompts {
 
         this.tidyListPromptMessage(this.listPromptLength);
 
-        process.stdin.on('keypress', this.tidyListPromptBound);
+        process.stdin.on("keypress", this.tidyListPromptBound);
 
         promise.then((choice) => {
 
-            process.stdin.off('keypress', this.tidyListPromptBound);
+            process.stdin.off("keypress", this.tidyListPromptBound);
 
             terminal.cyan("  " + choice[name]);
 
@@ -91,7 +91,7 @@ class InquirerPrompts {
             message: promptMsg
         };
 
-        if (typeof validateFunc === 'function') {
+        if (typeof validateFunc === "function") {
 
             promptOBJ.validate = validateFunc;
         }
@@ -100,11 +100,11 @@ class InquirerPrompts {
 
         this.tidyInputPromptMessage();
 
-        process.stdin.on('keypress', this.tidyInputPromptMessageBound);
+        process.stdin.on("keypress", this.tidyInputPromptMessageBound);
 
         promise.then(() => {
 
-            process.stdin.off('keypress', this.tidyInputPromptMessageBound);
+            process.stdin.off("keypress", this.tidyInputPromptMessageBound);
 
             terminal.hideCursor();
 
@@ -130,11 +130,11 @@ class InquirerPrompts {
 
         this.tidyInputPromptMessage();
 
-        process.stdin.on('keypress', this.tidyInputPromptMessageBound);
+        process.stdin.on("keypress", this.tidyInputPromptMessageBound);
 
         promise.then(() => {
 
-            process.stdin.off('keypress', this.tidyInputPromptMessageBound);
+            process.stdin.off("keypress", this.tidyInputPromptMessageBound);
  
             terminal.hideCursor();
             
@@ -262,7 +262,7 @@ class InquirerPrompts {
 
     checkIfExit(userInput) {
 
-        if (userInput.toLowerCase().trim() === 'exit') {
+        if (userInput.toLowerCase().trim() === "exit") {
 
             terminal.hideCursor("");  //with ("") it shows the cursor
             terminal("\n\n");

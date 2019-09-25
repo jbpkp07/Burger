@@ -1,5 +1,4 @@
 "use strict";
-/* global surveyQuestions, surveyOptions */
 
 
 class ViewController {
@@ -7,8 +6,17 @@ class ViewController {
     constructor() {
 
         this.orderName = $("#orderName");
-        this.orderCheckboxes = $('input[data-type=ingredient]');
+        this.orderCheckboxes = $("input[data-type=ingredient]");
         this.submitOrderBTN = $("#submitOrderBTN");
+        this.devourBTNs = $("div[data-type=devour]");
+
+        for (const blah of this.devourBTNs) {
+
+            console.log(blah.dataset.type);
+            console.log(blah.dataset.id);
+            console.log(blah.dataset.name);
+        }
+
 
         this.assignListeners();
     }
@@ -39,52 +47,47 @@ class ViewController {
             }
         }
 
-        if (this.isInputValid(name, ingredientIDs)) {
+        if (this.isInputValid(name, ingredientIDs, event)) {
 
             event.preventDefault();
+
+            this.clearInputFields();
 
             this.submitOrderBTN.off("click");
 
             const newBurger =
             {
-                name: name,
-                ingredientIDs: ingredientIDs
+                name,
+                ingredientIDs: JSON.stringify(ingredientIDs) //JSON.stringify (client) then JSON.parse (server) allows empty arrays to be used for POST
             };
 
-            console.log(newBurger);
+            $.post("/api/burgers", newBurger, () => {
 
-            // $.post("/api/friends", newBurger, (friendMatch) => {
+                location.reload();
 
-            //     console.log(`Friend Match...\n   id    : ${friendMatch.id}\n   name  : ${friendMatch.name}\n   photo : ${friendMatch.photo}\n   scores: [${friendMatch.scores}]\n   match%: ${friendMatch.percentageMatch}\n\n`);
+            }).fail((error) => {
 
-            //     this.showFriendMatchModal(friendMatch.name, friendMatch.photo, friendMatch.percentageMatch);
+                console.log(`${error.responseJSON.message}  ${error.responseJSON.reason}\n\n`);
 
-            //     this.clearInputFields();
-
-            // }).fail((error) => {
-
-            //     console.log(`${error.responseJSON.message}  ${error.responseJSON.reason}\n\n`);
-
-            //     alert(`${error.responseJSON.message}  ${error.responseJSON.reason}\n\n`);
-
-            // });
+                alert(`${error.responseJSON.message}  ${error.responseJSON.reason}\n\n`);
+            });
         }
-        // else {
-
-        //     alert("Invalid input: Unable to submit order!");
-        // }
     }
 
-    isInputValid(name, ingredientIDs) {
+    isInputValid(name, ingredientIDs, event) {
 
-        if (typeof name !== 'string' || name.length === 0) {
+        if (typeof name !== "string" || name.length === 0) {
 
             return false;
         }
 
-        if (name.length > 100) {
+        if (name.length > 30) {
 
-            alert("Burger name is too long, please keep it to less than 100 characters.");
+            event.preventDefault();
+
+            alert("Burger name is too long, please keep it to at most 30 characters.");
+
+            return false;
         }
 
         if (!Array.isArray(ingredientIDs) || ingredientIDs.length > this.orderCheckboxes.length) {
@@ -94,7 +97,7 @@ class ViewController {
 
         for (const id of ingredientIDs) {
 
-            if (typeof id !== 'number' || id <= 0 || id > this.orderCheckboxes.length) {
+            if (typeof id !== "number" || id <= 0 || id > this.orderCheckboxes.length) {
 
                 return false;
             }
@@ -103,60 +106,13 @@ class ViewController {
         return true;
     }
 
+    clearInputFields() {
 
-    // submitSurvey(event) {
+        this.orderName.val("");
 
-    //     const name = this.nameInputElement.val().trim();
-    //     const photo = this.photoInputElement.val().trim();
-    //     const scores = [];
+        for (const checkbox of this.orderCheckboxes) {
 
-    //     for (const selectElement of this.selectElements) {
-
-    //         const score = selectElement.val().trim();
-
-    //         scores.push(score);
-    //     }
-
-    //     if (this.isInputValid(name, photo, scores)) {
-
-    //         event.preventDefault();
-
-    //         const newFriend =
-    //         {
-    //             name: name,
-    //             photo: photo,
-    //             scores: scores
-    //         };
-
-    //         $.post("/api/friends", newFriend, (friendMatch) => {
-
-    //             console.log(`Friend Match...\n   id    : ${friendMatch.id}\n   name  : ${friendMatch.name}\n   photo : ${friendMatch.photo}\n   scores: [${friendMatch.scores}]\n   match%: ${friendMatch.percentageMatch}\n\n`);
-
-    //             this.showFriendMatchModal(friendMatch.name, friendMatch.photo, friendMatch.percentageMatch);
-
-    //             this.clearInputFields();
-
-    //         }).fail((error) => {
-
-    //             console.log(`${error.responseJSON.message}  ${error.responseJSON.reason}\n\n`);
-
-    //             alert(`${error.responseJSON.message}  ${error.responseJSON.reason}\n\n`);
-
-    //         });
-    //     }
-    // }
-
-
-
-    // clearInputFields() {
-
-    //     this.nameInputElement.val("");
-
-    //     this.photoInputElement.val("");
-
-    //     for (const selectElement of this.selectElements) {
-
-    //         selectElement.val("");
-    //     }
-    // }
+            $(checkbox).prop("checked", false);
+        }
+    }
 } 

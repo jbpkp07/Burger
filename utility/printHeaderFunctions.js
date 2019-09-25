@@ -1,5 +1,4 @@
 "use strict";
-/* global require, module */
 
 const terminal = require("terminal-kit").terminal;
 
@@ -41,7 +40,7 @@ function clearScreenBelowHeader() {
 
 module.exports = 
 {
-    printHeader: printHeader,
-    moveCursorToTop: moveCursorToTop,
-    clearScreenBelowHeader: clearScreenBelowHeader
+    printHeader,
+    moveCursorToTop,
+    clearScreenBelowHeader
 };

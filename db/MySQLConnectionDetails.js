@@ -1,7 +1,6 @@
 "use strict";
-/* global module, require */
 
-const configConnectionDetails = require('../config/configConnectionDetails.js');
+const configConnectionDetails = require("../config/configConnectionDetails.js");
 
 
 class MySQLConnectionDetails {
@@ -14,7 +13,7 @@ class MySQLConnectionDetails {
         this.password = configConnectionDetails.password;
         this.multipleStatements = configConnectionDetails.multipleStatments;
 
-        if (typeof connectToDB === 'boolean' && connectToDB === true) {
+        if (typeof connectToDB === "boolean" && connectToDB === true) {
 
             this.database = configConnectionDetails.database; 
         }

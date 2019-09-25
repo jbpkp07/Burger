@@ -1,11 +1,10 @@
 "use strict";
-/* global require, process, __dirname */
 
 const port = process.env.PORT || 3000;
 
-const configPaths = require('./config/configPaths.js');
-const terminal = require('terminal-kit').terminal;
-const express = require('express');
+const configPaths = require("./config/configPaths.js");
+const terminal = require("terminal-kit").terminal;
+const express = require("express");
 const expressHandlebars = require("express-handlebars");
 const header = require(configPaths.printHeaderFunctionsPath);
 const MySQLDatabase = require(configPaths.mySQLDatabasePath);
