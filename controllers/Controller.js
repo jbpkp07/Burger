@@ -20,6 +20,10 @@ class Controller {
         this.getHomePage();
 
         this.postAPIBurgers();
+
+        this.putAPIBurgers();
+
+        this.deleteAPIBurgers();
     }
 
     getHomePage() {  //Single page web app, this is the only page needed!
@@ -43,7 +47,7 @@ class Controller {
             });
 
             Promise.all([burgersPromise, ingredientsPromise]).then(() => {
-          
+
                 response.render("index", handleBarsOBJ);
 
             }).catch((error) => {
@@ -86,6 +90,48 @@ class Controller {
         });
     }
 
+    putAPIBurgers() {
+
+        this.router.put("/api/burgers/:id", (request, response) => {
+
+            const id = request.params.id;
+            const name = request.body.name;
+            const devoured = request.body.devoured;
+
+            this.burgersDatabase.updateBurger(id, name, devoured).then(() => {
+
+                response.status(200).end();
+
+            }).catch((error) => {
+
+                terminal.red(`  Unable to update burger:\n${error}`);
+
+                response.status(500).send(error);
+            });
+        });
+    }
+
+    deleteAPIBurgers() {
+
+        this.router.delete("/api/burgers/:id", (request, response) => {
+
+            const id = request.params.id;
+            // const name = request.body.name;
+            // const devoured = request.body.devoured;
+
+            this.burgersDatabase.deleteBurger(id).then(() => {
+
+                response.status(200).end();
+
+            }).catch((error) => {
+
+                terminal.red(`  Unable to delete burger:\n${error}`);
+
+                response.status(500).send(error);
+            });
+        });
+    }
+
     validatePost(name, ingredientIDs) {
 
         if (typeof name !== "string" || name.length === 0) {
@@ -114,21 +160,6 @@ class Controller {
         return true;
     }
 }
-
-
-
-// getAPIFriends() {
-
-//     this.router.get("/api/friends", (request, response) => {
-
-//         this.friendsDatabase.getAllFriendsJSON().then((jsonData) => {
-
-//             response.json(jsonData); 
-//         });
-//     });
-// }
-
-
 
 
 module.exports = Controller;

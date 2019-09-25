@@ -9,14 +9,7 @@ class ViewController {
         this.orderCheckboxes = $("input[data-type=ingredient]");
         this.submitOrderBTN = $("#submitOrderBTN");
         this.devourBTNs = $("div[data-type=devour]");
-
-        for (const blah of this.devourBTNs) {
-
-            console.log(blah.dataset.type);
-            console.log(blah.dataset.id);
-            console.log(blah.dataset.name);
-        }
-
+        this.deleteBTNs = $("div[data-type=delete]");
 
         this.assignListeners();
     }
@@ -25,9 +18,19 @@ class ViewController {
 
         this.orderName.focus();
 
-        this.submitOrderBTN.on("click", (event) => {
+        this.submitOrderBTN.click((event) => {
 
             this.submitOrder(event);
+        });
+
+        this.devourBTNs.click((event) => {
+
+            this.markAsDevoured(event);
+        });
+
+        this.deleteBTNs.click((event) => {
+
+            this.markAsDeleted(event);
         });
     }
 
@@ -67,11 +70,70 @@ class ViewController {
 
             }).fail((error) => {
 
-                console.log(`${error.responseJSON.message}  ${error.responseJSON.reason}\n\n`);
-
-                alert(`${error.responseJSON.message}  ${error.responseJSON.reason}\n\n`);
+                console.log(error.responseText);
             });
         }
+    }
+
+    markAsDevoured(event) {
+
+        const dataset = event.currentTarget.dataset;
+
+        if (dataset.devoured === "0") {  //captured from HTML as a string, not as number
+
+            this.devourBTNs.off("click");
+
+            const burger =
+            {
+                id: dataset.id,
+                name: dataset.name,
+                devoured: 1
+            };
+
+            const ajaxConfig =
+            {
+                type: "PUT",
+                data: burger
+            };
+
+            $.ajax(`/api/burgers/${burger.id}`, ajaxConfig).then(() => {
+
+                location.reload();
+
+            }).fail((error) => {
+
+                console.log(error.responseText);
+            });
+        }
+    }
+
+    markAsDeleted(event) {
+
+        const dataset = event.currentTarget.dataset;
+
+        this.devourBTNs.off("click");
+
+        const burger =
+        {
+            id: dataset.id,
+            name: dataset.name,
+            devoured: parseInt(dataset.devoured)
+        };
+
+        const ajaxConfig =
+        {
+            type: "DELETE",
+            data: burger
+        };
+
+        $.ajax(`/api/burgers/${burger.id}`, ajaxConfig).then(() => {
+
+            location.reload();
+
+        }).fail((error) => {
+
+            console.log(error.responseText);
+        });
     }
 
     isInputValid(name, ingredientIDs, event) {

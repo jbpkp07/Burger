@@ -21,24 +21,39 @@ class Burger extends ORM {
         this.isSaved = false;
     }
 
-    setValues(name, devoured) {
+    save(name, devoured) {
 
-        this.name = name;
-        this.devoured = devoured;
-    }
-
-    save() {
+        this.setValues(name, devoured);
 
         const promise = this.saveOne();
         
         return promise;
     }
 
-    delete() {
+    saveUpdate(id, name, devoured) {
+
+        this.id = id;
+
+        this.isSaved = true;
+
+        const promise = this.save(name, devoured);
+
+        return promise;
+    }
+
+    delete(id) {
+
+        this.id = id;
 
         const promise = this.deleteOne();
 
         return promise;
+    }
+
+    setValues(name, devoured) {
+
+        this.name = name;
+        this.devoured = devoured;
     }
 }
 

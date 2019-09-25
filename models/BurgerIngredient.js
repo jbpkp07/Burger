@@ -21,24 +21,37 @@ class BurgerIngredient extends ORM {
         this.isSaved = false;
     }
 
-    setValues(fkBurgerId, fkIngredientId) {
+    save(fkBurgerId, fkIngredientId) {
 
-        this.fk_burger_id = fkBurgerId;
-        this.fk_ingredient_id = fkIngredientId;
-    }
-
-    save() {
+        this.setValues(fkBurgerId, fkIngredientId);
 
         const promise = this.saveOne();
         
         return promise;
     }
 
-    delete() {
+    delete(id) {
+
+        this.id = id;
 
         const promise = this.deleteOne();
 
         return promise;
+    }
+
+    deleteByFKBurgerId(fkBurgerId) {
+
+        const query = `DELETE FROM ?? WHERE ?? = ?`;
+
+        const promise = this.queryDatabase(query, [this.tableName, "fk_burger_id", fkBurgerId]);
+
+        return promise;
+    }
+
+    setValues(fkBurgerId, fkIngredientId) {
+
+        this.fk_burger_id = fkBurgerId;
+        this.fk_ingredient_id = fkIngredientId;
     }
 }
 

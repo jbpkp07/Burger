@@ -48,14 +48,17 @@ class BurgersDatabase extends ORM {
                         burger = {};
                         burger.id = burgerIngredient.id;
                         burger.name = burgerIngredient.name;
-                        burger.devoured = Boolean(burgerIngredient.devoured);
+                        burger.devoured = burgerIngredient.devoured;
                         burger.ingredients = [];
                     }
 
                     burger.ingredients.push(burgerIngredient.ingredient);
                 }
+                
+                if (Object.keys(burger).length !== 0) {  //if last/only object is empty don't push it
 
-                burgers.push(burger);
+                    burgers.push(burger);
+                }
 
                 resolve(burgers);
 
@@ -79,9 +82,7 @@ class BurgersDatabase extends ORM {
 
             const newBurger = new Burger(this.mysqlDatabase);
 
-            newBurger.setValues(name, false);
-
-            newBurger.save().then(() => {
+            newBurger.save(name, false).then(() => {
 
                 if (newBurger.id === null) {
 
@@ -95,9 +96,7 @@ class BurgersDatabase extends ORM {
 
                     const newBurgerIngredient = new BurgerIngredient(this.mysqlDatabase);
 
-                    newBurgerIngredient.setValues(newBurger.id, ingredientId);
-
-                    const promise = newBurgerIngredient.save();
+                    const promise = newBurgerIngredient.save(newBurger.id, ingredientId);
 
                     promises.push(promise);
                 }
@@ -115,6 +114,41 @@ class BurgersDatabase extends ORM {
 
                 reject(error);
             });
+        });
+    }
+
+    updateBurger(id, name, devoured) {
+
+        const burger = new Burger(this.mysqlDatabase);
+
+        const promise = burger.saveUpdate(id, name, devoured);
+
+        return promise;
+    }
+
+    deleteBurger(id) {
+
+        return new Promise((resolve, reject) => {
+
+            const burgerIngredient = new BurgerIngredient(this.mysqlDatabase);
+
+            burgerIngredient.deleteByFKBurgerId(id).then(() => {
+                
+                const burger = new Burger(this.mysqlDatabase);
+
+                burger.delete(id).then(() => {
+                    
+                    resolve("Burger deleted successfully");
+
+                }).catch((error) => {
+                    
+                    reject(error);
+                });
+
+            }).catch((error) => {
+                
+                reject(error);
+            }); 
         });
     }
 }

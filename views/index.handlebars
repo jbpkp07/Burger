@@ -18,16 +18,18 @@
 
     <div id="burgers">
         {{#each burgers}}
-            <div class="burger">
-                <div class="burgerName">{{name}}</div>
-                <div class="burgerIngredientsWrapper">
-                    {{#each ingredients}}
-                        <div class="burgerIngredient">{{this}}</div>
-                    {{/each}}
+            <div {{#unless devoured}} class="burger" {{else}} class="burger burgerDevoured" {{/unless}}>
+                <div {{#if devoured}} class="devoured" {{/if}}>
+                    <div class="burgerName">{{name}}</div>
+                    <div class="burgerIngredientsWrapper">
+                        {{#each ingredients}}
+                            <div class="burgerIngredient">{{this}}</div>
+                        {{/each}}
+                    </div>
                 </div>
-                <div class="burgerActionsWrapper">
-                    <div class="btn burgerActionsBtn" data-type="devour" data-id="{{id}}" data-name="{{name}}">devour</div>
-                    <div class="btn burgerActionsBtn" data-type="delete" data-id="{{id}}" data-name="{{name}}">delete</div>
+                <div {{#unless devoured}} class="burgerActionsWrapper" {{else}} class="burgerActionsWrapper burgerActionsWrapperDevoured" {{/unless}}>
+                    <div {{#unless devoured}} class="btn burgerActionsBtn" {{else}} class="btn disabledBurgerActionsBtn" {{/unless}} data-type="devour" data-id="{{id}}" data-name="{{name}}" data-devoured="{{devoured}}">devour</div>
+                    <div class="btn burgerActionsBtn" data-type="delete" data-id="{{id}}" data-name="{{name}}" data-devoured="{{devoured}}">delete</div>
                 </div>
             </div>
         {{/each}}

@@ -14,6 +14,7 @@
     --medium-blue: rgba(30,145,255,1.0);
 
     --light-red: rgba(251,103,105,1.0);
+    --light-red-transparent: rgba(251,103,105,0.25);
 
     --light-green: rgba(42,252,156,1.0);
 }
@@ -168,6 +169,14 @@ hr {
     width: 300px;
 }
 
+.burgerDevoured {
+    border: 5px solid var(--light-red-transparent);
+}
+
+.devoured {
+    opacity: 0.25;
+}
+
 .burgerName {
     background: var(--medium-gray);
     border-bottom: 2px solid var(--light-red);
@@ -203,7 +212,11 @@ hr {
     width: 100%;
 }
 
-.burgerActionsBtn {
+.burgerActionsWrapperDevoured {
+    border-top: 2px solid var(--light-red-transparent);
+}
+
+.burgerActionsBtn, .disabledBurgerActionsBtn {
     background: var(--light-gray);
     border: 2px solid var(--light-blue);
     color: var(--light-blue);
@@ -214,4 +227,9 @@ hr {
 
 .burgerActionsBtn:hover {
     border: 2px solid var(--light-green);
+}
+
+.disabledBurgerActionsBtn {
+    cursor: not-allowed;
+    opacity: 0.25;
 }
