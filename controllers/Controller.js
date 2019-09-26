@@ -116,8 +116,6 @@ class Controller {
         this.router.delete("/api/burgers/:id", (request, response) => {
 
             const id = request.params.id;
-            // const name = request.body.name;
-            // const devoured = request.body.devoured;
 
             this.burgersDatabase.deleteBurger(id).then(() => {
 

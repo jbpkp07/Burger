@@ -157,6 +157,15 @@ class ViewController {
             return false;
         }
 
+        if (ingredientIDs.length === 0) {
+
+            event.preventDefault();
+
+            alert("Please enter at least 1 ingredient for your burger.");
+
+            return false;
+        }
+
         for (const id of ingredientIDs) {
 
             if (typeof id !== "number" || id <= 0 || id > this.orderCheckboxes.length) {

@@ -20,18 +20,20 @@ class BurgersDatabase extends ORM {
 
         return new Promise((resolve, reject) => {
 
-            const query = `SELECT 	burgers.id AS id,
+            const query = `SELECT 	burger_ingredients.id AS bi_id,
+                                    burgers.id AS id,
                                     burgers.name AS name, 
                                     burgers.devoured,
                                     ingredients.name AS ingredient
                             FROM burger_ingredients
                             INNER JOIN burgers ON burgers.id = burger_ingredients.fk_burger_id
-                            INNER JOIN ingredients ON ingredients.id = burger_ingredients.fk_ingredient_id;`;
+                            INNER JOIN ingredients ON ingredients.id = burger_ingredients.fk_ingredient_id
+                            ORDER BY bi_id ; `;
 
             const promise = this.queryDatabase(query, []);  //custom query
 
             promise.then(([rows, fields]) => {
-     
+
                 const burgers = [];
 
                 let burger = {};
