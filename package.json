@@ -19,6 +19,6 @@
     "express-handlebars": "^3.1.0",
     "inquirer": "^7.0.0",
     "mysql2": "^1.7.0",
-    "terminal-kit": "^1.31.3"
+    "terminal-kit": "^3.0.0"
   }
 }
